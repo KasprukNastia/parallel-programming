@@ -50,6 +50,7 @@ namespace Lab1
             return strBld.ToString();
         }
 
+        // One-threaded execution
         public void CalcMainDiagonal()
         {
             for (int i = 0; i < _dimension; i++)
@@ -58,6 +59,7 @@ namespace Lab1
             }
         }
 
+        // Multi-threaded execution (old style)
         public void CalcMainDiagonalAsParallelOldFashioned()
         {
             List<Thread> threads = new List<Thread>(_dimension);
@@ -72,6 +74,8 @@ namespace Lab1
             }
             threads.ForEach(t => t.Join());
         }
+
+        // Multi-threaded execution (new style)
         public async Task CalcMainDiagonalAsParallelNewStyleAsync()
         {
             List<Task> tasks = new List<Task>(_dimension);

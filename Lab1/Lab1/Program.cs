@@ -7,27 +7,36 @@ namespace Lab1
     {
         static void Main(string[] args)
         {
-            var matrix = new Matrix(20000);
+            int dimension = 20000;
+            var matrix = new Matrix(dimension);
             
-            var sw = Stopwatch.StartNew();
+            var swOneThread = Stopwatch.StartNew();
             matrix.CalcMainDiagonal();
-            sw.Stop();
-            Console.WriteLine($"Simple matrix main diagonal calculation: {sw.ElapsedMilliseconds} ms");
-            //Console.WriteLine(matrix.ToString());
+            swOneThread.Stop();
+            Console.WriteLine(
+                $"One thread matrix main diagonal calculation time: {swOneThread.ElapsedMilliseconds} ms");
             Console.WriteLine();
 
-            sw = Stopwatch.StartNew();
+            var swMultipleThreads = Stopwatch.StartNew();
             matrix.CalcMainDiagonalAsParallelOldFashioned();
-            sw.Stop();
-            Console.WriteLine($"Old fashioned parallel matrix main diagonal calculation: {sw.ElapsedMilliseconds} ms");
-            //Console.WriteLine(matrix.ToString());
+            swMultipleThreads.Stop();
+            Console.WriteLine(
+                $"Multiple threads matrix main diagonal calculation time (old fashioned parallel programming style): {swMultipleThreads.ElapsedMilliseconds} ms");
+            double accelerationFactorOld = (double)swOneThread.ElapsedMilliseconds / swMultipleThreads.ElapsedMilliseconds;
+            Console.WriteLine(
+                $"Acceleration factor (Коефiцiєнт прискорення) for old fashioned parallel programming style: {accelerationFactorOld}");
+            Console.WriteLine($"Algorithm efficiency (Ефективнiсть алгоритму): {accelerationFactorOld / dimension}");
             Console.WriteLine();
 
-            sw = Stopwatch.StartNew();
+            var swMultipleThreadsTask = Stopwatch.StartNew();
             matrix.CalcMainDiagonalAsParallelNewStyleAsync().Wait();
-            sw.Stop();
-            Console.WriteLine($"New style parallel matrix main diagonal calculation: {sw.ElapsedMilliseconds} ms");
-            //Console.WriteLine(matrix.ToString());
+            swMultipleThreadsTask.Stop();
+            Console.WriteLine(
+                $"Multiple threads matrix main diagonal calculation time (new style of parallel programming): {swMultipleThreadsTask.ElapsedMilliseconds} ms");
+            double accelerationFactorNew = (double)swOneThread.ElapsedMilliseconds / swMultipleThreadsTask.ElapsedMilliseconds;
+            Console.WriteLine(
+                $"Acceleration factor (Коефiцiєнт прискорення) for new style of parallel programming: {accelerationFactorNew}");
+            Console.WriteLine($"Algorithm efficiency (Ефективнiсть алгоритму): {accelerationFactorNew / dimension}");
             Console.WriteLine();
         }
     }
