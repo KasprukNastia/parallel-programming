@@ -11,8 +11,10 @@ namespace Lab2
 
             var cpu = new CPU(firstProcessesQueue, secondProcessesQueue);
 
-            var firstCpuProcess = new CPUProcess(cpuProcessId: 1, firstProcessesQueue, cpu);
-            var secondCpuProcess = new CPUProcess(cpuProcessId: 2, secondProcessesQueue, cpu);
+            var firstCpuProcess = new CPUProcess(
+                cpuProcessId: 1, firstProcessesQueue, cpu, minProcessDurationMs: 8000, maxProcessDurationMs: 20000);
+            var secondCpuProcess = new CPUProcess(
+                cpuProcessId: 2, secondProcessesQueue, cpu, minProcessDurationMs: 7000, maxProcessDurationMs: 15000);
 
             var cpuThread = new Thread(cpu.Run);
             var firstCpuProcessThread = new Thread(firstCpuProcess.GenerateProcesses);
