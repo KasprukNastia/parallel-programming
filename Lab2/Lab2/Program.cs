@@ -6,15 +6,15 @@ namespace Lab2
     {
         static void Main(string[] args)
         {
-            var firstProcessesQueue = new CPUQueue();
-            var secondProcessesQueue = new CPUQueue();
+            var firstProcessesQueue = new CPUQueue(maxSize: 7);
+            var secondProcessesQueue = new CPUQueue(maxSize: 7);
 
             var cpu = new CPU(firstProcessesQueue, secondProcessesQueue);
 
             var firstCpuProcess = new CPUProcess(
-                cpuProcessId: 1, firstProcessesQueue, cpu, minProcessDurationMs: 8000, maxProcessDurationMs: 20000);
+                cpuProcessId: 1, firstProcessesQueue, cpu, minProcessDurationMs: 3000, maxProcessDurationMs: 6000);
             var secondCpuProcess = new CPUProcess(
-                cpuProcessId: 2, secondProcessesQueue, cpu, minProcessDurationMs: 7000, maxProcessDurationMs: 15000);
+                cpuProcessId: 2, secondProcessesQueue, cpu, minProcessDurationMs: 2000, maxProcessDurationMs: 5000);
 
             var cpuThread = new Thread(cpu.Run);
             var firstCpuProcessThread = new Thread(firstCpuProcess.GenerateProcesses);

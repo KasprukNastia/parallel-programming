@@ -35,20 +35,20 @@ namespace Lab2
             {
                 process = new Process(random.Next(_minProcessDurationMs, _maxProcessDurationMs));
 
-                Console.WriteLine($"Потiк {_cpuProcessId} згенерував процес '{process.ProcessGuid}' тривалiстю {process.ExecutionDurationMs} мс \n");
+                Console.WriteLine($"|{DateTime.Now.ToString("dd.MM.yyyy hh:mm:ss.fff tt")}| потiк {_cpuProcessId} згенерував процес '{process.ProcessGuid}' тривалiстю {process.ExecutionDurationMs} мс \n");
 
                 if (!_cpu.IsBusy)
                 {
-                    Console.WriteLine($"Процес '{process.ProcessGuid}' надiслався на виконання CPU \n");
+                    Console.WriteLine($"|{DateTime.Now.ToString("dd.MM.yyyy hh:mm:ss.fff tt")}| процес '{process.ProcessGuid}' надiслався на виконання CPU \n");
                     _cpu.Run(process);
                 }
                 else
                 {
-                    Console.WriteLine($"Процес '{process.ProcessGuid}' помiстився в чергу \n");
+                    Console.WriteLine($"|{DateTime.Now.ToString("dd.MM.yyyy hh:mm:ss.fff tt")}| процес '{process.ProcessGuid}' помiстився в чергу \n");
                     _queue.Enqueue(process);
                 }
 
-                Thread.Sleep(random.Next(_minProcessDurationMs, (_minProcessDurationMs + _maxProcessDurationMs) / 2));
+                Thread.Sleep(random.Next(100, 1000));
             }
         }
     }

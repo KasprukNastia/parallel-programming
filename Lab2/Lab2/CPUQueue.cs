@@ -5,9 +5,10 @@ namespace Lab2
 {
     public class CPUQueue
     {
-        private static readonly object _locker = new object();
+        private readonly object _locker = new object();
 
-        private readonly LinkedList<Process> _processesQueue = new LinkedList<Process>();
+        private readonly int _maxSize;
+        private readonly LinkedList<Process> _processesQueue;
 
         public int Count
         {
@@ -27,11 +28,20 @@ namespace Lab2
             }
         }
 
+        public CPUQueue(int maxSize = 20)
+        {
+            _maxSize = maxSize;
+            _processesQueue = new LinkedList<Process>();
+        }
+
         public Process Dequeue()
         {
             bool acquiredLock = false;
             try
             {
+                while (Count == 0)
+                    continue;
+
                 Monitor.Enter(_locker, ref acquiredLock);
                 Process toReturn = _processesQueue.First.Value;
                 _processesQueue.RemoveFirst();
@@ -49,6 +59,9 @@ namespace Lab2
             bool acquiredLock = false;
             try
             {
+                while (Count >= _maxSize)
+                    continue;
+
                 Monitor.Enter(_locker, ref acquiredLock);
                 _processesQueue.AddLast(process);
             }

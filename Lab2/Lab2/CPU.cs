@@ -5,7 +5,7 @@ namespace Lab2
 {
     public class CPU
     {
-        private static readonly object _locker = new object();
+        private readonly object _locker = new object();
 
         private readonly CPUQueue _firstQueue;
         private readonly CPUQueue _secondQueue;
@@ -16,15 +16,19 @@ namespace Lab2
         {
             _firstQueue = firstQueue ?? throw new ArgumentNullException(nameof(firstQueue));
             _secondQueue = secondQueue ?? throw new ArgumentNullException(nameof(secondQueue));
+            IsBusy = false;
         }
 
         public void Run(Process process)
         {
+            while (IsBusy)
+                continue;
+
             lock (_locker)
             {
                 IsBusy = true;
 
-                Console.WriteLine($"Процесор обробляє процес '{process.ProcessGuid}' тривалiстю {process.ExecutionDurationMs} мс \n");
+                Console.WriteLine($"|{DateTime.Now.ToString("dd.MM.yyyy hh:mm:ss.fff tt")}| процесор обробляє процес '{process.ProcessGuid}' тривалiстю {process.ExecutionDurationMs} мс \n");
 
                 Thread.Sleep(process.ExecutionDurationMs);
 
@@ -43,7 +47,7 @@ namespace Lab2
                     {
                         process = _firstQueue.Dequeue();
 
-                        Console.WriteLine($"Процесор був вiльним, тому процес '{process.ProcessGuid}' з 1 черги пiшов на обробку CPU \n");
+                        Console.WriteLine($"|{DateTime.Now.ToString("dd.MM.yyyy hh:mm:ss.fff tt")}| процесор був вiльним, тому процес '{process.ProcessGuid}' з 1 черги пiшов на обробку CPU \n");
 
                         Run(process);
                     }
@@ -51,7 +55,7 @@ namespace Lab2
                     {
                         process = _secondQueue.Dequeue();
 
-                        Console.WriteLine($"Процесор був вiльним, а 1 черга пустою, тому процес '{process.ProcessGuid}' з 2 черги пiшов на обробку CPU \n");
+                        Console.WriteLine($"|{DateTime.Now.ToString("dd.MM.yyyy hh:mm:ss.fff tt")}| процесор був вiльним, а 1 черга пустою, тому процес '{process.ProcessGuid}' з 2 черги пiшов на обробку CPU \n");
 
                         Run(process);
                     }  
