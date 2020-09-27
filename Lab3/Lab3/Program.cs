@@ -9,10 +9,34 @@ namespace Lab3
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            var random = new Random();
+
+            int randomNumbersCount = 10;
+            var randomNumbers = new List<long>(randomNumbersCount);
+
+            for(int i = 0; i < randomNumbersCount; i++)
+                randomNumbers.Add(random.Next(-100, 100));
+
+            Console.WriteLine($"Зненерований список чисел: {string.Join(" ", randomNumbers)}");
+            Console.WriteLine();
+
+            Console.WriteLine("Перевiрка роботи першої функцiї");
+            Console.WriteLine($"Кiлькiсть парних чисел: {CalcElementsOnCondition(randomNumbers, n => n % 2 == 0)}");
+            Console.WriteLine($"Кiлькiсть непарних чисел: {CalcElementsOnCondition(randomNumbers, n => n % 2 != 0)}");
+            Console.WriteLine();
+
+            Console.WriteLine("Перевiрка роботи другої функцiї");
+            (long min, long minIndex, long max, long maxIndex) = CalcMinAndMaxWithIndices(randomNumbers);
+            Console.WriteLine($"Мiнiмальний елемент {min} знаходиться пiд iндексом {minIndex}");
+            Console.WriteLine($"Максимальний елемент {max} знаходиться пiд iндексом {maxIndex}");
+            Console.WriteLine();
+
+            Console.WriteLine("Перевiрка роботи третьої функцiї");
+            Console.WriteLine($"Контрольна сума для чисел {CalcControlSum(randomNumbers)}");
+            Console.WriteLine($"Перевiрка контрольної суми послiдовним алгоритмом: {randomNumbers.Aggregate((f, s) => f ^ s)}");
         }
 
-        // Паралельна функція для знаходження кількості елементів за умовою
+        // Паралельна функцiя для знаходження кiлькостi елементiв за умовою
         public static long CalcElementsOnCondition(IEnumerable<long> elementsList, Func<long, bool> selector)
         {
             long elementsCount = 0;
@@ -26,7 +50,7 @@ namespace Lab3
             return elementsCount;
         }
 
-        // Паралельна функція для знаходження мінімального та максимального елементів з індексами
+        // Паралельна функцiя для знаходження мiнiмального та максимального елементiв з iндексами
         public static (long min, long minIndex, long max, long maxIndex) CalcMinAndMaxWithIndices(IEnumerable<long> elementsList)
         {
             long min = 0, minIndex = 0, max = 0, maxIndex = 0;
@@ -45,12 +69,12 @@ namespace Lab3
                 }
 
                 return elem;
-            });
+            }).ToList();
 
             return (min, minIndex, max, maxIndex);
         }
 
-        // Паралельна функція для знаходження контрольної суми із використанням XOR
+        // Паралельна функцiя для знаходження контрольної суми iз використанням XOR
         public static long CalcControlSum(IEnumerable<long> elementsList)
         {
             long controlSum = 0;
