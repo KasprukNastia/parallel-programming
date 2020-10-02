@@ -9,11 +9,10 @@ namespace Lab4.Task1
         private readonly Collection _consumptionCollection;
         public CancellationTokenSource CancellationTokenSource { get; }
 
-        public Consumer(Collection consumptionCollection, 
-            CancellationTokenSource cancellationTokenSource)
+        public Consumer(Collection consumptionCollection)
         {
             _consumptionCollection = consumptionCollection ?? throw new ArgumentNullException(nameof(consumptionCollection));
-            CancellationTokenSource = cancellationTokenSource ?? throw new ArgumentNullException(nameof(cancellationTokenSource));
+            CancellationTokenSource = new CancellationTokenSource();
         }
 
         public Task Consume()
