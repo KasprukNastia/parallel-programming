@@ -39,10 +39,11 @@ namespace Lab2
             bool acquiredLock = false;
             try
             {
-                while (Count == 0)
-                    continue;
-
                 Monitor.Enter(_locker, ref acquiredLock);
+
+                while (_processesQueue.Count == 0)
+                    Monitor.Wait(_locker);
+                
                 Process toReturn = _processesQueue.First.Value;
                 _processesQueue.RemoveFirst();
                 return toReturn;
@@ -59,10 +60,11 @@ namespace Lab2
             bool acquiredLock = false;
             try
             {
-                while (Count >= _maxSize)
-                    continue;
-
                 Monitor.Enter(_locker, ref acquiredLock);
+
+                while (_processesQueue.Count >= _maxSize)
+                    Monitor.Wait(_locker);
+                
                 _processesQueue.AddLast(process);
             }
             finally
