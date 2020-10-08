@@ -1,6 +1,7 @@
 ﻿using Lab4.Task1;
 using Lab4.Task2;
 using Lab4.Task3;
+using Lab4.Task4;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,7 +12,7 @@ namespace Lab4
     {
         static void Main(string[] args)
         {
-            RunTask2(10, 3);
+            RunTask4(5);
         }
 
         // Task 1: Producer-consumer
@@ -72,6 +73,24 @@ namespace Lab4
             }
 
             Task.WaitAll(philosophersTasks);
+        }
+
+        // Task 4: Sleeping Barber
+        public static void RunTask4(int maxClientsCount)
+        {
+            var barberShop = new BarberShop(maxClientsCount);
+            var barber = new Barber(barberShop);
+
+            List<Task> allTasks = new List<Task>(maxClientsCount * 3 + 1);
+            allTasks.Add(barber.Run());
+            Client client;
+            for(int i = 0; i < maxClientsCount * 3; i++)
+            {
+                client = new Client(i, barberShop);
+                allTasks.Add(client.Run());
+            }
+
+            Task.WaitAll(allTasks.ToArray());
         }
     }
 }
