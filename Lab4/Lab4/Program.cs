@@ -1,5 +1,8 @@
 ﻿using Lab4.Task1;
+using Lab4.Task2;
 using Lab4.Task3;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Lab4
@@ -8,7 +11,7 @@ namespace Lab4
     {
         static void Main(string[] args)
         {
-            RunTask3();
+            RunTask2(10, 3);
         }
 
         // Task 1: Producer-consumer
@@ -22,6 +25,19 @@ namespace Lab4
             var consumerTask = consumer.Consume();
 
             Task.WaitAll(producerTask, consumerTask);
+        }
+
+        // Task 2: Readers/Writers
+        public static void RunTask2(int readredsCount, int writersCount)
+        {
+            IEnumerable<Writer> writers = 
+                Enumerable.Range(1, writersCount + 1).Select(i => new Writer(i));
+            IEnumerable<Reader> readers = 
+                Enumerable.Range(1, readredsCount + 1).Select(i => new Reader(i, Writer.WriterSemaphore));
+
+            Task[] readersWritersTasks = readers.Select(r => r.Read()).Concat(writers.Select(w => w.Write())).ToArray();
+
+            Task.WaitAll(readersWritersTasks);
         }
 
         // Task 3: Dining Philosophers

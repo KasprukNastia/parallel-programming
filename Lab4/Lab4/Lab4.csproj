@@ -7,7 +7,6 @@
 
   <ItemGroup>
     <Folder Include="Task4\" />
-    <Folder Include="Task2\" />
   </ItemGroup>
 
 </Project>
