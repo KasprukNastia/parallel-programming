@@ -21,21 +21,19 @@ namespace Lab4.Task4
             {
                 while (!CancellationTokenSource.IsCancellationRequested)
                 {
-                    _barberShop.SeatsSemaphore.WaitOne();
-                    if (_barberShop.TakenSeats == 0)
-                    {
-                        _barberShop.SeatsSemaphore.Release();
-                        _barberShop.BarberSemaphore.Release();
-                        _barberShop.SeatsSemaphore.WaitOne();
-                    }
-
+                    // Try to acquire a customer - if none is available, go to sleep.
                     _barberShop.ClientsSemaphore.WaitOne();
-                    Client client = _barberShop.Clients.Dequeue();
+                    // Awake - try to get access to modify # of available seats, otherwise sleep.
+                    _barberShop.SeatsSemaphore.WaitOne();
+                    // One waiting room chair becomes free.
                     _barberShop.TakenSeats--;
-                    Console.WriteLine($"{DateTime.Now.ToString("hh:mm:ss.fff")}: Barber serves the client with id '{client.ClientId}' for {client.HaircutDuration} ms");
-                    Thread.Sleep(client.HaircutDuration);
-                    _barberShop.ClientsSemaphore.Release();
+                    // I am ready to cut.
+                    _barberShop.BarberSemaphore.Release();
+                    // Don't need the lock on the chairs anymore.
                     _barberShop.SeatsSemaphore.Release();
+
+                    // Cut hair here.
+                    Console.WriteLine($"{DateTime.Now.ToString("hh:mm:ss.fff")}: Barber serves the client");
                 }
             }, CancellationTokenSource.Token);
         }

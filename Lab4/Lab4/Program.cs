@@ -80,17 +80,9 @@ namespace Lab4
         {
             var barberShop = new BarberShop(maxClientsCount);
             var barber = new Barber(barberShop);
+            var client = new Client(barberShop);
 
-            List<Task> allTasks = new List<Task>(maxClientsCount * 3 + 1);
-            allTasks.Add(barber.Run());
-            Client client;
-            for(int i = 0; i < maxClientsCount * 3; i++)
-            {
-                client = new Client(i, barberShop);
-                allTasks.Add(client.Run());
-            }
-
-            Task.WaitAll(allTasks.ToArray());
+            Task.WaitAll(barber.Run(), client.Run());
         }
     }
 }

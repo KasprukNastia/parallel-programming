@@ -18,7 +18,7 @@ namespace Lab4.Task4
             TakenSeats = 0;
             MaxClientsCount = maxClientsCount;
             Clients = new Queue<Client>(maxClientsCount);
-            ClientsSemaphore = new Semaphore(1, 1);
+            ClientsSemaphore = new Semaphore(0, maxClientsCount);
             BarberSemaphore = new Semaphore(0, 1);
             SeatsSemaphore = new Semaphore(1, 1);
         }

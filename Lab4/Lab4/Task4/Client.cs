@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Lab4.Task4
@@ -6,46 +7,49 @@ namespace Lab4.Task4
     public class Client
     {
         private readonly BarberShop _barberShop;
-        public int ClientId { get; }
-        public TimeSpan HaircutDuration { get; private set; }
+        public CancellationTokenSource CancellationTokenSource { get; }
 
-        public Client(int clientId, BarberShop barberShop)
+        public Client(BarberShop barberShop)
         {
-            ClientId = clientId;
             _barberShop = barberShop ?? throw new ArgumentNullException(nameof(barberShop));
-            HaircutDuration = TimeSpan.FromMilliseconds(new Random().Next(1000, 3000));
+            CancellationTokenSource = new CancellationTokenSource();
         }
 
         public Task Run()
         {
             return Task.Run(() =>
             {
-                _barberShop.SeatsSemaphore.WaitOne();
-                if (_barberShop.TakenSeats < _barberShop.MaxClientsCount)
+                var random = new Random();
+                // Run in an infinite loop to simulate multiple customers.
+                while (!CancellationTokenSource.IsCancellationRequested)
                 {
-                    Console.WriteLine($"The number of taken seats is {_barberShop.TakenSeats} so new client with id '{ClientId}' WILL be added to the queue");
-                    
-                    _barberShop.ClientsSemaphore.WaitOne();
-                    _barberShop.Clients.Enqueue(this);
-                    _barberShop.TakenSeats++;
-                    _barberShop.ClientsSemaphore.Release();
-
-                    if (_barberShop.Clients.Count == 1)
+                    // Try to get access to the waiting room chairs.
+                    _barberShop.SeatsSemaphore.WaitOne();
+                    // If there are any free seats:
+                    if (_barberShop.TakenSeats < _barberShop.MaxClientsCount)
                     {
+                        // sit down in a chair
+                        _barberShop.TakenSeats++;
+                        // notify the barber, who's waiting until there is a customer
+                        _barberShop.ClientsSemaphore.Release();
+                        // don't need to lock the chairs anymore
                         _barberShop.SeatsSemaphore.Release();
+                        // wait until the barber is ready
                         _barberShop.BarberSemaphore.WaitOne();
+
+                        // Have hair cut here.
+                        int haircutDuretionMs = random.Next(100, 1000);
+                        Console.WriteLine($"Client '{Guid.NewGuid()}' has hair cutted for {haircutDuretionMs} ms");
+                        Thread.Sleep(haircutDuretionMs);
                     }
+                    // otherwise, there are no free seats; tough luck --
                     else
                     {
+                        // but don't forget to release the lock on the seats!
                         _barberShop.SeatsSemaphore.Release();
-                    }          
+                    }
                 }
-                else
-                {
-                    Console.WriteLine($"Queue is filled. The number of taken seats is {_barberShop.TakenSeats} so new client with id '{ClientId}' WILL NOT be added to the queue");
-                    _barberShop.SeatsSemaphore.Release();
-                }
-            });
+            }, CancellationTokenSource.Token);
         }
     }
 
