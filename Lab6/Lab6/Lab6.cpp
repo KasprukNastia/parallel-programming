@@ -27,7 +27,7 @@ int main(int argc, char** argv)
             }
         }
 
-        // Sending copies of the matrix to the different processes       
+        // Sending copies of the matrix to the different processes
         for(int i = 0; i < MATRIX_DIMENSION; i++) {
             int matrix_copy[MATRIX_DIMENSION][MATRIX_DIMENSION];
             std::copy(&master_matrix[0][0], &master_matrix[0][0] + MATRIX_DIMENSION * MATRIX_DIMENSION, &matrix_copy[0][0]);
@@ -59,16 +59,25 @@ int main(int argc, char** argv)
         MPI_Recv(received_matrix, MATRIX_DIMENSION * MATRIX_DIMENSION, MPI_INT, MASTER_RANK, tag, MPI_COMM_WORLD, &status);
 
         // Parallel calculation of the diagonal value on [rank - 1][rank - 1] position
-        #pragma omp parallel for
-        for (int i = 0; i < MATRIX_DIMENSION; i++) {
-            if (i == rank - 1) continue;
-            received_matrix[rank - 1][rank - 1] += received_matrix[rank - 1][i];
-            received_matrix[rank - 1][rank - 1] += received_matrix[i][rank - 1];
+        int diagonal_value = 0;
+        /* 
+           shared      - shared variables
+           reduction   - sets a local variable (diagonal_value), as well as the operation that
+                         will be performed on local variables when leaving the parallel region ("+")
+           num_threads - number of the threads that will execute the region
+        */
+        #pragma omp parallel shared(received_matrix) reduction (+: diagonal_value) num_threads(MATRIX_DIMENSION)
+        {
+            #pragma omp for
+            for (int i = 0; i < MATRIX_DIMENSION; i++) {
+                if (i == rank - 1) continue;
+                diagonal_value += (received_matrix[rank - 1][i] + received_matrix[i][rank - 1]);
+            }
         }
 
         // Sending back to the master process calculated diagonal value on [rank - 1][rank - 1] position
         int result[1];
-        result[0] = received_matrix[rank - 1][rank - 1];
+        result[0] = diagonal_value;
         MPI_Send(result, 1, MPI_INT, MASTER_RANK, tag, MPI_COMM_WORLD);
     }
 
